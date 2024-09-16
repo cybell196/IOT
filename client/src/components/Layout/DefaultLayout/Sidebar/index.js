@@ -1,18 +1,21 @@
 import {Button} from "@nextui-org/react";
 import config from "~/config";
 import { useState } from 'react';
-import Menu, { MenuItem } from "./Menu";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { MdOutlineDashboard, MdOutlineAddReaction } from "react-icons/md";
+import { FaDatabase } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 
+// bg-gradient-to-tr from-slate-700 to-slate-300
 
 
 function Sidebar() {
-  const [activeButton, setActiveButton] = useState(null);
+    const location = useLocation();
+    
 
-  const handleClick = (buttonName) => {
-    setActiveButton(buttonName);
-  };
-  
+    const isActive = (route) => {
+      return location.pathname === route;
+    };
 
   return (
       <div className=" w-4/5 h-full">
@@ -41,10 +44,14 @@ function Sidebar() {
                                   type="button"
                                   color="none"
                                   radius="md"
-                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 ${activeButton === 'Dashboard' ? 'bg-gradient-to-tr from-slate-700 to-slate-300' : ''}`}
-                                  onClick={() => handleClick('Dashboard')}
+                                  startContent={<MdOutlineDashboard className="text-3xl ml-4"/>}
+                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
+                                      isActive(config.routes.home)
+                                          ? 'bg-gradient-to-tr from-slate-700 to-slate-300'
+                                          : ''
+                                  }`}
                               >
-                                  <p className="text-3xl text-start font-bold mx-4">Dashboard</p>
+                                  <p className="text-3xl text-start font-bold flex items-center">Dashboard</p>
                               </Button>
                           </Link>
                       </li>
@@ -55,10 +62,14 @@ function Sidebar() {
                                   type="button"
                                   color="none"
                                   radius="md"
-                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 ${activeButton === 'DataSensor' ? 'bg-gradient-to-tr from-slate-700 to-slate-300' : ''}`}
-                                  onClick={() => handleClick('DataSensor')}
+                                  startContent={<FaDatabase className="text-3xl ml-4"/>}
+                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
+                                      isActive(config.routes.datasensor)
+                                          ? 'bg-gradient-to-tr from-slate-700 to-slate-300'
+                                          : ''
+                                  }`}
                               >
-                                  <p className="text-3xl text-start font-bold mx-4">Data Sensor</p>
+                                  <p className="text-3xl text-start font-bold">Data Sensor</p>
                               </Button>
                           </Link>
                       </li>
@@ -69,10 +80,14 @@ function Sidebar() {
                                   type="button"
                                   color="none"
                                   radius="md"
-                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 ${activeButton === 'ActionHistory' ? 'bg-gradient-to-tr from-slate-700 to-slate-300' : ''}`}
-                                  onClick={() => handleClick('ActionHistory')}
+                                  startContent={<MdOutlineAddReaction className="text-3xl ml-4"/>}
+                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
+                                      isActive(config.routes.actionhistory)
+                                          ? 'bg-gradient-to-tr from-slate-700 to-slate-300'
+                                          : ''
+                                  }`}
                               >
-                                  <p className="text-3xl text-start font-bold mx-4">Action History</p>
+                                  <p className="text-3xl text-start font-bold">Action History</p>
                               </Button>
                           </Link>
                       </li>
@@ -83,10 +98,14 @@ function Sidebar() {
                                   type="button"
                                   color="none"
                                   radius="md"
-                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 ${activeButton === 'Profile' ? 'bg-gradient-to-tr from-slate-700 to-slate-300' : ''}`}
-                                  onClick={() => handleClick('Profile')}
+                                  startContent={<CgProfile className="text-3xl ml-4"/>}
+                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
+                                      isActive(config.routes.profile)
+                                          ? 'bg-gradient-to-tr from-slate-700 to-slate-300'
+                                          : ''
+                                  }`}
                               >
-                                  <p className="text-3xl text-start font-bold mx-4">Profile</p>
+                                  <p className="text-3xl text-start font-bold">Profile</p>
                               </Button>
                           </Link>
                       </li>

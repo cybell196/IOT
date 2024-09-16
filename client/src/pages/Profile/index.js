@@ -6,6 +6,7 @@ import { SiPostman } from "react-icons/si";
 
 function ProfileCard() {
   return (
+      <>
       <div className="mx-auto grid grid-cols-5 bg-slate-200 bg-opacity-30 rounded-3xl w-full">
           <Image src="/emotewater.webp" alt="Avatar" width="200" radius="full" className="my-12 ml-44  col-span-1" />
 
@@ -16,52 +17,60 @@ function ProfileCard() {
                   <span className="text-3xl text-white block">Số điện thoại: 0392514756</span>
 
                   <div className="mt-8 grid grid-cols-3 gap-2">
-                    <div className=''>
-                        <Button 
-                            
-                            className="bg-slate-950 text-white text-2xl"
-                            radius="sm"
-                            size="lg"
-                            startContent={<FaGithub />}
-                            fullWidth
-                        >
-                            <a href="#">GitHub</a>
-                        </Button>
-                    </div>
+                      <div className="">
+                          <a href="https://github.com/cybell196/IOT" target="_blank" rel="noopener noreferrer">
+                              <Button
+                                  className="bg-slate-950 text-white text-2xl"
+                                  radius="sm"
+                                  size="lg"
+                                  startContent={<FaGithub />}
+                                  fullWidth
+                              >
+                                  GitHub
+                              </Button>
+                          </a>
+                      </div>
 
-                    <div className=''>
-                        <Button 
-                            color="success"
-                            className="bg-red-400 text-white text-2xl"
-                            radius="sm"
-                            size="lg"
-                            startContent={<FaRegFilePdf />}
-                            fullWidth
-                        >
-                            <a href="#">PDF</a>
-                        </Button>
-                    </div>
+                      <div className="">
+                          <a href="#">
+                              <Button
+                                  color="success"
+                                  className="bg-red-400 text-white text-2xl"
+                                  radius="sm"
+                                  size="lg"
+                                  startContent={<FaRegFilePdf />}
+                                  fullWidth
+                              >
+                                  PDF
+                              </Button>
+                          </a>
+                      </div>
 
-                    <div className=''>
-                        <Button 
-                            color="success"
-                            className="bg-orange-400 text-white text-2xl"
-                            radius="sm"
-                            size="lg"
-                            startContent={<SiPostman />}
-                            fullWidth
-                        >
-                            <a href="#">API Doc</a>
-                        </Button>
-                    </div>
-                    
-                    
+                      <div className="">
+                          <a href="#">
+                              <Button
+                                  color="success"
+                                  className="bg-orange-400 text-white text-2xl"
+                                  radius="sm"
+                                  size="lg"
+                                  startContent={<SiPostman />}
+                                  fullWidth
+                              >
+                                  API Doc
+                              </Button>
+                          </a>
+                      </div>
                   </div>
               </div>
-
-              
+              <Image src="/0909.gif" alt="khabanh" className='ml-28'/>
           </div>
+          
       </div>
+      <div>
+        
+      </div>
+
+      </>
   );
 }
 
