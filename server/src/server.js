@@ -1,17 +1,31 @@
 const express = require('express');
+const http = require('http');
+const cors = require('cors');
+const { subDataSensor } = require('./mqttHandler'); // Import hàm subDataSensor để xử lý MQTT
+const { setupWebSocket } = require('./webSocketHandler'); // Import hàm setupWebSocket để xử lý WebSocket
+
+// Import routes
+const dataSensorRoutes = require('./routes/dataSensorRoutes');
+const actionHistoryRoutes = require('./routes/actionHistoryRoutes');
+
+// Tạo ứng dụng Express và server HTTP
 const app = express();
-const connection = require('./database');
+const server = http.createServer(app);
 
-app.get('/users', (req, res) => {
-  connection.query('SELECT * FROM users', (err, results) => {
-    if (err) {
-      res.status(500).send('Có lỗi xảy ra');
-    } else {
-      res.json(results);
-    }
-  });
+//Middleware
+app.use(express.json());
+app.use(cors());
+
+// MQTT
+subDataSensor();
+
+// Routes
+app.use('/api/data-sensor', dataSensorRoutes);
+app.use('/api/action-history', actionHistoryRoutes);
+app.use('/api/last-data', dataSensorRoutes);
+server.listen(3002, () => {
+    console.log('Server đang chạy tại http://localhost:3002');
 });
 
-app.listen(3000, () => {
-  console.log('Server đang chạy trên cổng 3000');
-});
+// Khởi tạo WebSocket server
+setupWebSocket(server);

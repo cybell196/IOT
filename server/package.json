@@ -2,12 +2,16 @@
   "name": "iot",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/server.js"
   },
   "dependencies": {
-    "express": "^4.19.2",
-    "mysql": "^2.18.1"
+    "cors": "^2.8.5",
+    "express": "^4.21.0",
+    "mqtt": "^5.10.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.11.3",
+    "ws": "^8.18.0"
   }
 }

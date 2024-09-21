@@ -1,18 +1,20 @@
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
+// Tạo kết nối đến MySQL
 const connection = mysql.createConnection({
-  host: 'localhost',      // Địa chỉ máy chủ MySQL (XAMPP thường là 'localhost')
-  user: 'root',           // Tài khoản MySQL (thường mặc định là 'root')
-  password: '',           // Mật khẩu MySQL (thường mặc định là rỗng trong XAMPP)
-  database: 'iot' // Tên cơ sở dữ liệu bạn muốn kết nối
+    host: 'localhost',  // Địa chỉ MySQL server
+    user: 'root',       // Tên người dùng MySQL (thường là root)
+    password: '',       // Mật khẩu của MySQL (để trống nếu không có)
+    database: 'iot' // Tên database bạn muốn kết nối
 });
 
+// Kết nối MySQL
 connection.connect((err) => {
-  if (err) {
-    console.error('Kết nối MySQL thất bại: ', err);
-    return;
-  }
-  console.log('Kết nối MySQL thành công!');
+    if (err) {
+        console.error('Lỗi kết nối MySQL:', err);
+        return;
+    }
+    console.log('Kết nối MySQL thành công!');
 });
 
 module.exports = connection;

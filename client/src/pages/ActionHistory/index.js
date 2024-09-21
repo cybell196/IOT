@@ -19,16 +19,17 @@ import {
 
 import { FaAngleDown, FaSearch } from "react-icons/fa";
 
-
+ 
 import {columns, users, statusOptions} from "./data";
 import {capitalize} from "./utils";
+import { fetchData } from './api';
 
 const statusColorMap = {
-  bật: "success",
-  tắt: "danger",
+  Bật: "success",
+  Tắt: "danger",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["id", "device", "status", "time"];
+const INITIAL_VISIBLE_COLUMNS = ["id", "thiet_bi", "hanh_dong", "thoi_gian"];
 
 export default function App() {
   const [filterValue, setFilterValue] = React.useState("");
@@ -37,9 +38,25 @@ export default function App() {
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
-    direction: "ascending",
+    column: "thoi_gian",
+    direction: "descending",
   });
+
+  // ----------------- Fetch data -----------------
+  const [users, setUsers] = React.useState([]); // new state for users
+  React.useEffect(() => {
+    fetchData().then(data => {
+      if (Array.isArray(data)) {
+        setUsers(data);
+        console.log('Updated users:', data); // Log new data
+      } else {
+        console.error('fetchData did not return an array:', data);
+      }
+    }).catch(error => {
+      console.error('fetchData failed:', error);
+    });
+  }, []);
+  // ----------------------------------------------
   const [page, setPage] = React.useState(1);
 
   const hasSearchFilter = Boolean(filterValue);
@@ -55,12 +72,12 @@ export default function App() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.time.toLowerCase().includes(filterValue.toLowerCase()),
+        user.thoi_gian.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status),
+        Array.from(statusFilter).includes(user.hanh_dong),
       );
     }
 
@@ -92,7 +109,7 @@ export default function App() {
     switch (columnKey) {
       case "status":
         return (
-          <Chip className="capitalize text-2xl font-bold p-2" color={statusColorMap[user.status]} size="lg" variant="flat">
+          <Chip className="capitalize text-2xl font-bold p-2" color={statusColorMap[user.hanh_dong]} size="lg" variant="flat">
             {cellValue}
           </Chip>
         );

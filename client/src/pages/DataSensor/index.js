@@ -17,8 +17,12 @@ import {
 import {columns, users} from "./data";
 import {capitalize} from "./utils";
 import { FaAngleDown, FaSearch } from "react-icons/fa";
+import { fetchData } from './api';
 
-const INITIAL_VISIBLE_COLUMNS = ["id", "nhietdo", "doam", "anhsang", "time"];
+
+
+
+const INITIAL_VISIBLE_COLUMNS = ["id", "nhiet_do", "do_am", "anh_sang", "thoi_gian"];
 
 export default function App() {
   const [filterValue, setFilterValue] = React.useState("");
@@ -30,6 +34,23 @@ export default function App() {
     column: "id",
     direction: "ascending",
   });
+
+  // ----------------- Fetch data -----------------
+  const [users, setUsers] = React.useState([]); // new state for users
+  React.useEffect(() => {
+    fetchData().then(data => {
+      if (Array.isArray(data)) {
+        setUsers(data);
+        console.log('Updated users:', data); // Log new data
+      } else {
+        console.error('fetchData did not return an array:', data);
+      }
+    }).catch(error => {
+      console.error('fetchData failed:', error);
+    });
+  }, []);
+  // ----------------------------------------------
+
   const [page, setPage] = React.useState(1);
 
   const hasSearchFilter = Boolean(filterValue);
@@ -45,9 +66,11 @@ export default function App() {
 
     if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        user.time.toLowerCase().includes(filterValue.toLowerCase()),
+        user.thoi_gian && typeof user.thoi_gian === 'string' && filterValue && typeof filterValue === 'string' ?
+        user.thoi_gian.toLowerCase().includes(filterValue.toLowerCase()) : false,
       );
     }
+
     if (statusFilter !== "all") {
       filteredUsers = filteredUsers.filter((user) =>
         Array.from(statusFilter).includes(user.status),
