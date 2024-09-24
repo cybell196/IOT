@@ -34,7 +34,7 @@ exports.getAllData = (req, res) => {
 };
 
 exports.getLastData = (req, res) => {
-    // Thay vì dùng id từ params, chúng ta lấy dòng cuối cùng
+    // Lấy dòng cuối cùng từ bảng DataSensor
     connection.query('SELECT * FROM DataSensor ORDER BY id DESC LIMIT 1', (err, results) => {
         if (err) {
             console.error('Lỗi truy vấn:', err);

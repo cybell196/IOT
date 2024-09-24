@@ -23,9 +23,10 @@ subDataSensor();
 app.use('/api/data-sensor', dataSensorRoutes);
 app.use('/api/action-history', actionHistoryRoutes);
 app.use('/api/last-data', dataSensorRoutes);
+
 server.listen(3002, () => {
     console.log('Server đang chạy tại http://localhost:3002');
 });
 
-// Khởi tạo WebSocket server
+// Khởi tạo WebSocket server và lắng nghe các endpoint khác nhau
 setupWebSocket(server);
