@@ -1,14 +1,27 @@
-import axios from "axios";
+import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:3002"; // Đặt URL API của bạn
-
-// Hàm lấy tất cả dữ liệu từ MySQL
-export const fetchAllData = async () => {
-  try {
-    const response = await axios.get(`${API_BASE_URL}/api/data-sensor`);
-    return response.data;
-  } catch (error) {
-    console.error("Lỗi khi gọi API lấy dữ liệu:", error);
-    return [];
-  }
-};
+export function fetchAllData() {
+    return axios
+        .get('http://localhost:3002/api/data-sensor/data-chart', {
+            params: {
+                // sortBy: 'nhiet_do',  // Uncomment if needed
+                order: 'DESC',      // Uncomment if needed
+                limit: 8           // Uncomment if needed
+            },
+        })
+        .then((response) => {
+            // Kiểm tra dữ liệu nhận được từ server
+            console.log('Dữ liệu từ server:', response.data);
+            // Đảm bảo dữ liệu là mảng trước khi trả về
+            if (Array.isArray(response.data)) {
+                return response.data;
+            } else {
+                console.error('Dữ liệu không phải là mảng:', response.data);
+                return [];
+            }
+        })
+        .catch((error) => {
+            console.error('Lỗi:', error);
+            return [];  // Trả về mảng rỗng khi có lỗi
+        });
+}

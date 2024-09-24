@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { fetchAllData } from "./api"; // Import API
-import { connectWebSocket } from "./webSocket"; // Import WebSocket
+import { connectWebSocket } from "../webSocket"; // Import WebSocket
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,65 +44,51 @@ const LineChart = () => {
     ],
   });
 
-  // Hàm để cập nhật dữ liệu cho biểu đồ
+  // Hàm để cập nhật dữ liệu cho biểu đồ với tối đa 8 giá trị
   const updateChartData = (newData) => {
-    setChartData((prevData) => ({
-      labels: [...prevData.labels, newData.thoi_gian], // Cập nhật dữ liệu thời gian
-      datasets: [
-        {
-          ...prevData.datasets[0],
-          data: [...prevData.datasets[0].data, newData.nhietdo], // Cập nhật nhiệt độ
-        },
-        {
-          ...prevData.datasets[1],
-          data: [...prevData.datasets[1].data, newData.doam], // Cập nhật độ ẩm
-        },
-        {
-          ...prevData.datasets[2],
-          data: [...prevData.datasets[2].data, newData.anhsang], // Cập nhật ánh sáng
-        },
-      ],
-    }));
+    setChartData((prevData) => {
+      const maxDataPoints = 8;
+
+      const newLabels = [...prevData.labels, newData.thoi_gian].slice(-maxDataPoints);
+      const newNhietDoData = [...prevData.datasets[0].data, newData.nhietdo].slice(-maxDataPoints);
+      const newDoAmData = [...prevData.datasets[1].data, newData.doam].slice(-maxDataPoints);
+      const newAnhSangData = [...prevData.datasets[2].data, newData.anhsang].slice(-maxDataPoints);
+
+      return {
+        labels: newLabels,
+        datasets: [
+          { ...prevData.datasets[0], data: newNhietDoData },
+          { ...prevData.datasets[1], data: newDoAmData },
+          { ...prevData.datasets[2], data: newAnhSangData },
+        ],
+      };
+    });
   };
 
-  // Load dữ liệu ban đầu từ API khi component được render
   useEffect(() => {
     const loadInitialData = async () => {
       const data = await fetchAllData();
       if (data.length > 0) {
-        const labels = data.map((item) => item.thoi_gian); // Thời gian cho trục x
+        const labels = data.map((item) => item.thoi_gian);
         const nhietDoData = data.map((item) => item.nhiet_do);
         const doAmData = data.map((item) => item.do_am);
         const anhSangData = data.map((item) => item.anh_sang);
 
         setChartData({
-          labels, // Đưa thời gian vào trục x
+          labels,
           datasets: [
-            {
-              ...chartData.datasets[0],
-              data: nhietDoData,
-            },
-            {
-              ...chartData.datasets[1],
-              data: doAmData,
-            },
-            {
-              ...chartData.datasets[2],
-              data: anhSangData,
-            },
+            { ...chartData.datasets[0], data: nhietDoData },
+            { ...chartData.datasets[1], data: doAmData },
+            { ...chartData.datasets[2], data: anhSangData },
           ],
         });
       }
     };
 
-    loadInitialData(); // Lấy dữ liệu ban đầu
-  }, []);
+    loadInitialData();
 
-  // Kết nối với WebSocket khi component render
-  useEffect(() => {
-    connectWebSocket((newData) => {
-      updateChartData(newData); // Cập nhật dữ liệu mới từ WebSocket, bao gồm cả thời gian
-    });
+    const ws = connectWebSocket(updateChartData); // Kết nối WebSocket chung
+    return () => ws && ws.close();
   }, []);
 
   const options = {
@@ -132,6 +118,7 @@ const LineChart = () => {
     scales: {
       x: {
         display: true,
+        
         title: {
           display: true,
           text: "Thời gian",

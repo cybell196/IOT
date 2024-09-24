@@ -6,7 +6,7 @@ exports.getAllData = (req, res) => {
 
     let query = 'SELECT id, nhiet_do, do_am, anh_sang, thoi_gian FROM DataSensor';
 
-    if (filter) {
+    if (filter) { 
         query += ` WHERE ${filter}`;
     }
 
@@ -46,5 +46,36 @@ exports.getLastData = (req, res) => {
             return;
         }
         res.json(results[0]); // Trả về dòng cuối cùng
+    });
+};
+
+
+exports.getData = (req, res) => {
+    // Nhận tham số limit từ query, nếu không có thì mặc định là 8
+    const { limit = 8 } = req.query;
+
+    // Chuyển giá trị limit thành số nguyên
+    const limitValue = parseInt(limit, 10);
+
+    // Tạo câu truy vấn SQL để lấy 8 giá trị cuối cùng (ORDER BY id DESC)
+    let query = `SELECT id, nhiet_do, do_am, anh_sang, thoi_gian FROM DataSensor ORDER BY id DESC LIMIT ?`;
+
+    // Thực hiện truy vấn
+    connection.query(query, [limitValue], (err, results) => {
+        if (err) {
+            console.error('Lỗi truy vấn:', err);
+            res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu' });
+            return;
+        }
+
+        // Đảo ngược thứ tự kết quả để từ cũ đến mới (ngược với DESC)
+        const adjustedResults = results.reverse().map(row => {
+            // Chuyển đổi thời gian sang múi giờ địa phương
+            const thoi_gian_local = new Date(row.thoi_gian).toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' });
+            return { ...row, thoi_gian: thoi_gian_local };
+        });
+
+        // Trả về kết quả cho client
+        res.json(adjustedResults);
     });
 };

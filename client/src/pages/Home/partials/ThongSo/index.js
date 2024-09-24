@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaTemperatureLow } from "react-icons/fa6";
 import { IoIosWater, IoMdSunny} from "react-icons/io";
 import { fetchLastData } from './api'; // Import hàm gọi API từ file api.js
-import { createWebSocket } from './webSocket'; // Import hàm WebSocket từ file webSocket.js
+import { connectWebSocket } from '../webSocket'; // Import hàm WebSocket từ file webSocket.js
 
 import CountUp from 'react-countup';
 
@@ -19,12 +19,12 @@ function ThongSo() {
                 doam: result.do_am,
                 anhsang: result.anh_sang,
             });
-            setOldData(oldDataTemp); // Cập nhật oldData sau khi data đã được cập nhật
+            setOldData(oldDataTemp);
         };
         loadData();
     
-        const ws = createWebSocket(setData);
-        return () => ws.close();
+        const ws = connectWebSocket(setData); // Chỉ sử dụng kết nối WebSocket chung
+        return () => ws && ws.close(); // Đóng kết nối khi component unmount
     }, []);
     
     return(
