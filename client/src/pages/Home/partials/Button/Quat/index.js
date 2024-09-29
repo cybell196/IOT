@@ -2,6 +2,7 @@ import { FaFan } from "react-icons/fa";
 import { Switch, VisuallyHidden, useSwitch } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { initWebSocket, sendWebSocketMessage, addWebSocketListener } from "../webSocketControl"; // Sử dụng file WebSocket tách riêng
+import { getButtonState, updateButtonState } from "../api";
 
 const ThemeSwitch = (props) => {
   const {
@@ -17,6 +18,15 @@ const ThemeSwitch = (props) => {
   const [isFanOn, setIsFanOn] = useState(false); // Trạng thái bật tắt quạt
 
   useEffect(() => {
+    // Lấy trạng thái từ server khi trang được load
+    getButtonState()
+      .then(data => {
+        setIsFanOn(data.button2Active); // Lấy trạng thái quạt (button 2)
+      })
+      .catch(error => {
+        console.error("Lỗi khi lấy trạng thái từ server:", error);
+      });
+    
     // Khởi tạo kết nối WebSocket
     initWebSocket();
 
@@ -46,6 +56,15 @@ const ThemeSwitch = (props) => {
 
     // Gửi message tới server qua WebSocket
     sendWebSocketMessage(message);
+
+    // Cập nhật trạng thái quạt lên server (MySQL)
+    updateButtonState({ button2Active: !isFanOn })
+      .then(response => {
+        console.log("Trạng thái quạt đã được lưu:", response);
+      })
+      .catch(error => {
+        console.error("Lỗi khi lưu trạng thái quạt:", error);
+      });
   };
 
   return (
@@ -61,7 +80,8 @@ const ThemeSwitch = (props) => {
               "w-24 h-24 p-4",
               "flex items-center justify-center",
               "rounded-2xl bg-white hover:bg-slate-200",
-              loading ? "animate-spin" : "", // Hiển thị animation loading khi đợi phản hồi
+              isFanOn ? "bg-green-500 hover:bg-red-700" : "bg-slate-200 hover:bg-green-500",
+              loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
             ],
           })}
           onClick={handleClick} // Gọi hàm handleClick khi nhấn nút

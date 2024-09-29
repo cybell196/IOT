@@ -15,6 +15,7 @@ import {
     Chip,
     User,
     Pagination,
+    ScrollShadow,
 } from '@nextui-org/react';
 
 import { FaAngleDown, FaSearch } from 'react-icons/fa';
@@ -28,7 +29,7 @@ const statusColorMap = {
     Tắt: 'danger',
 };
 
-const INITIAL_VISIBLE_COLUMNS = ['thiet_bi', 'hanh_dong', 'thoi_gian'];
+const INITIAL_VISIBLE_COLUMNS = ["id" ,'thiet_bi', 'hanh_dong', 'thoi_gian'];
 
 export default function App() {
     const [filterValue, setFilterValue] = React.useState('');
@@ -144,11 +145,29 @@ export default function App() {
         setPage(1);
     }, []);
 
+    const onRowsPerPageChange = React.useCallback((e) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+    }, []);
+
     const topContent = React.useMemo(() => {
         return (
             <div className=" grid grid-cols-3 gap-4 mb-2">
                 <div className="flex items-end gap-3 col-span-1">
                     <span className="text-white text-2xl font-bold">Tổng cộng {users.length} kết quả</span>
+                    <div className="flex justify-between items-center ml-12">
+                        <label className="flex items-center text-default-400 text-lg">
+                            Số hàng trên một dòng:
+                            <select 
+                                className="bg-transparent outline-none text-yellow-400 text-small font-bold"
+                                onChange={onRowsPerPageChange}
+                            >
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div className="flex gap-12 w-full col-span-2">
                     <div className="w-full">
@@ -223,6 +242,7 @@ export default function App() {
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
     return (
+        
         <Table
             aria-label="Example table with custom cells, pagination and sorting"
             isHeaderSticky
@@ -234,15 +254,17 @@ export default function App() {
             topContentPlacement="outside"
             onSelectionChange={setSelectedKeys}
             onSortChange={setSortDescriptor}
+            
             classNames={{
-                wrapper: 'bg-slate-950 bg-opacity-50',
+                wrapper: 'bg-slate-950 bg-opacity-50 overflow-auto max-h-[480px]',
                 table: 'text-white bg-slate-950 bg-opacity-30 rounded-lg mt-4',
 
-                tbody: 'bg-slate-950 bg-opacity-50 rounded-lg',
+                tbody: 'bg-slate-950 bg-opacity-50 rounded-lg ',
                 tr: 'hover:bg-yellow-600',
                 td: 'px-8 py-4 text-2xl font-bold text-center',
                 th: 'text-2xl px-8 py-4 text-yellow-200 text-center bg-slate-950 bg-opacity-90',
             }}
+            
         >
             <TableHeader columns={headerColumns}>
                 {(column) => (
@@ -255,13 +277,16 @@ export default function App() {
                     </TableColumn>
                 )}
             </TableHeader>
-            <TableBody emptyContent={'No users found'} items={paginatedItems}>
-                {(item) => (
-                    <TableRow key={item.id}>
-                        {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
-                    </TableRow>
-                )}
-            </TableBody>
+            {/* <ScrollShadow className="h-[400px]"> */}
+                <TableBody emptyContent={'No users found'} items={paginatedItems}>
+                    {(item) => (
+                        <TableRow key={item.id}>
+                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        </TableRow>
+                    )}
+                </TableBody>
+            {/* </ScrollShadow> */}
+            
         </Table>
     );
 }

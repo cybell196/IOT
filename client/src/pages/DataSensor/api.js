@@ -7,6 +7,7 @@ export function fetchData() {
                 // sortBy: 'nhiet_do',  // Uncomment if needed
                 // order: 'DESC',      // Uncomment if needed
                 // limit: 10           // Uncomment if needed
+                filter: 'nhiet_do > 0'  // Example: Get data with temperature >`
             },
         })
         .then((response) => {

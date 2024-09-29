@@ -2,6 +2,7 @@ import { FaLightbulb } from "react-icons/fa6";
 import { Switch, VisuallyHidden, useSwitch } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { initWebSocket, sendWebSocketMessage, addWebSocketListener } from "../webSocketControl"; // Import các hàm từ file WebSocket
+import { getButtonState, updateButtonState } from "../api";
 
 const ThemeSwitch = (props) => {
   const {
@@ -15,8 +16,17 @@ const ThemeSwitch = (props) => {
 
   const [loading, setLoading] = useState(false); // Trạng thái loading
   const [isLightOn, setIsLightOn] = useState(false); // Trạng thái bật tắt đèn
-
+  
   useEffect(() => {
+    // Lấy trạng thái từ server khi trang được load
+    getButtonState()
+      .then(data => {
+        setIsLightOn(data.button1Active); // Lấy trạng thái bóng đèn (button 1)
+      })
+      .catch(error => {
+        console.error("Lỗi khi lấy trạng thái từ server:", error);
+      });
+    
     // Khởi tạo kết nối WebSocket một lần
     initWebSocket();
 
@@ -37,6 +47,7 @@ const ThemeSwitch = (props) => {
   }, []);
 
   const handleClick = () => {
+    
     setLoading(true); // Bật trạng thái loading khi nhấn nút
 
     // Tạo JSON message tùy theo trạng thái đèn
@@ -47,6 +58,16 @@ const ThemeSwitch = (props) => {
 
     // Gửi message tới server qua WebSocket
     sendWebSocketMessage(message);
+
+    // Cập nhật trạng thái bóng đèn lên server (MySQL)
+    updateButtonState({ button1Active: !isLightOn })
+      .then(response => {
+        console.log("Trạng thái bóng đèn đã được lưu:", response);
+      })
+      .catch(error => {
+        console.error("Lỗi khi lưu trạng thái bóng đèn:", error);
+      });
+    
   };
 
   return (
@@ -61,17 +82,20 @@ const ThemeSwitch = (props) => {
             class: [
               "w-24 h-24 p-4",
               "flex items-center justify-center",
-              "rounded-2xl bg-white hover:bg-slate-200",
-              loading ? "animate-spin" : "", // Hiển thị animation loading khi đợi phản hồi
+              "rounded-2xl ",
+              isLightOn ? "bg-green-500 hover:bg-red-700" : "bg-slate-200 hover:bg-green-500",
+              
+              loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
             ],
           })}
           onClick={handleClick} // Gọi hàm handleClick khi nhấn nút
         >
           {isLightOn ? (
-            <FaLightbulb className="text-yellow-300 w-full h-full" />
+            <FaLightbulb className="w-full h-full text-yellow-300 spin" />
           ) : (
             <FaLightbulb className="w-full h-full" />
           )}
+          {/* <FaLightbulb className="w-full h-full" /> */}
         </div>
       </Component>
       <p className="text-white select-none font-bold mx-4 pr-2">

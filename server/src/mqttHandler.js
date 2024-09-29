@@ -1,7 +1,12 @@
 const { format } = require('date-fns');
 const mqtt = require("mqtt");
-const mqttBrokerUrl = "mqtt://localhost:1883"; // Địa chỉ MQTT broker của bạn
-const mqttClient = mqtt.connect(mqttBrokerUrl);
+const mqttBrokerUrl = "mqtt://localhost:2003"; // Địa chỉ MQTT broker của bạn
+const options = {
+  username: "nguyenanhkiet",  // Thêm username MQTT
+  password: "b21dccn471"   // Thêm password MQTT
+};
+const mqttClient = mqtt.connect(mqttBrokerUrl, options);
+
 const connection = require("./db"); // Kết nối MySQL
 const { sendDataToDataClients, sendDataToControlClients } = require("./webSocketHandler"); // Gửi dữ liệu tới client qua WebSocket
 

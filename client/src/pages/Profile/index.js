@@ -8,7 +8,7 @@ function ProfileCard() {
   return (
       <>
       <div className="mx-auto grid grid-cols-5 bg-slate-200 bg-opacity-30 rounded-3xl w-full">
-          <Image src="/emotewater.webp" alt="Avatar" width="200" radius="full" className="my-12 ml-44  col-span-1" />
+          <Image src="/avt.jpg" alt="Avatar" width="200" radius="full" className="my-12 ml-44  col-span-1" />
 
           <div className="col-span-4 mt-24 ml-44 flex items-center">
               <div className="mb-auto">
@@ -47,7 +47,7 @@ function ProfileCard() {
                       </div>
 
                       <div className="">
-                          <a href="#">
+                          <a href="http://localhost:3002/api-docs" target='_blank'>
                               <Button
                                   color="success"
                                   className="bg-orange-400 text-white text-2xl"

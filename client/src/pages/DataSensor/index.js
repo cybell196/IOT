@@ -23,10 +23,6 @@ const INITIAL_VISIBLE_COLUMNS = ['nhiet_do', 'do_am', 'anh_sang', 'thoi_gian'];
 
 export default function App() {
     const [filterValue, setFilterValue] = React.useState('');
-    // const [filterType, setFilterType] = React.useState(''); // Loại lọc: Nhiệt độ, Độ ẩm, Ánh sáng
-    // const [filterCondition, setFilterCondition] = React.useState(''); // Lớn hơn, Nhỏ hơn
-    // const [filterStatValue, setFilterStatValue] = React.useState(''); // Giá trị người dùng nhập
-    // const [filteredStatItems, setFilteredStatItems] = React.useState(users); // Lưu kết quả lọc
 
     const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
     const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
@@ -68,22 +64,22 @@ export default function App() {
     // Lọc dữ liệu
     // const handleFilter = () => {
     //   let filteredUsers = [...users];
-    
+
     //   // Thực hiện lọc theo lựa chọn
     //   if (filterType && filterCondition && filterStatValue) {
     //     filteredUsers = filteredUsers.filter((user) => {
     //       const valueToCompare = user[filterType]; // Lấy giá trị từ user tương ứng với loại lọc (nhiệt độ, độ ẩm, ánh sáng)
-          
+
     //       if (filterCondition === 'greater') {
     //         return valueToCompare >= parseFloat(filterStatValue);
     //       } else if (filterCondition === 'less') {
     //         return valueToCompare <= parseFloat(filterStatValue);
     //       }
-          
+
     //       return true;
     //     });
     //   }
-    
+
     //   // Cập nhật danh sách sau khi lọc
     //   setFilteredStatItems(filteredStatItems);
     // };
@@ -150,10 +146,10 @@ export default function App() {
         }
     }, []);
 
-    // const onRowsPerPageChange = React.useCallback((e) => {
-    //   setRowsPerPage(Number(e.target.value));
-    //   setPage(1);
-    // }, []);
+    const onRowsPerPageChange = React.useCallback((e) => {
+        setRowsPerPage(Number(e.target.value));
+        setPage(1);
+    }, []);
 
     const onSearchChange = React.useCallback((value) => {
         if (value) {
@@ -174,12 +170,23 @@ export default function App() {
             <div className=" grid grid-cols-3 gap-4 mb-2">
                 <div className="flex items-end gap-3 col-span-1">
                     <span className="text-white text-2xl font-bold">Tổng cộng {users.length} kết quả</span>
+                    <div className="flex justify-between items-center ml-12">
+                        <label className="flex items-center text-default-400 text-lg">
+                            Số hàng trên một dòng:
+                            <select 
+                                className="bg-transparent outline-none text-yellow-400 text-small font-bold"
+                                onChange={onRowsPerPageChange}
+                            >
+                                <option value="10">10</option>
+                                <option value="15">15</option>
+                                <option value="20">20</option>
+                            </select>
+                        </label>
+                    </div>
                 </div>
                 <div className="flex gap-12 w-full col-span-2">
                     <div className="w-full">
-                        <div className="w-full flex items-center justify-center">
-                            
-                        </div>
+                        <div className="w-full flex items-center justify-center"></div>
                         <div className="w-full grid grid-cols-3">
                             <div className="w-full col-start-2 col-end-3">
                                 <span className="ml-2 text-white text-2xl font-bold">Tìm kiếm theo thời gian</span>
@@ -230,7 +237,8 @@ export default function App() {
             <div className="flex w-full justify-center">
                 <Pagination
                     showControls
-                    loop
+                    isCompact
+                    dotsJump={10} // Khoảng cách nhảy khi nhấn vào nút "..."
                     color="warning"
                     showShadow
                     page={page}
@@ -260,7 +268,7 @@ export default function App() {
             onSelectionChange={setSelectedKeys}
             onSortChange={setSortDescriptor}
             classNames={{
-                wrapper: 'bg-slate-950 bg-opacity-50',
+                wrapper: 'bg-slate-950 bg-opacity-50 overflow-auto max-h-[480px]',
                 table: 'text-white bg-slate-950 bg-opacity-30 rounded-lg mt-4',
 
                 tbody: 'bg-slate-950 bg-opacity-50 rounded-lg',

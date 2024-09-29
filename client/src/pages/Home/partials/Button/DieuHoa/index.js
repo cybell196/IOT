@@ -2,6 +2,7 @@ import { TbAirConditioning } from "react-icons/tb";
 import { Switch, VisuallyHidden, useSwitch } from "@nextui-org/react";
 import { useState, useEffect } from "react";
 import { initWebSocket, sendWebSocketMessage, addWebSocketListener } from "../webSocketControl"; // Sử dụng file WebSocket tách riêng
+import { getButtonState, updateButtonState } from "../api"; // Sử dụng API đã tách
 
 const ThemeSwitch = (props) => {
   const {
@@ -17,6 +18,15 @@ const ThemeSwitch = (props) => {
   const [isACOn, setIsACOn] = useState(false); // Trạng thái bật tắt điều hòa
 
   useEffect(() => {
+    // Lấy trạng thái từ server khi trang được load
+    getButtonState()
+      .then(data => {
+        setIsACOn(data.button3Active); // Lấy trạng thái điều hòa (button 3)
+      })
+      .catch(error => {
+        console.error("Lỗi khi lấy trạng thái từ server:", error);
+      });
+    
     // Khởi tạo kết nối WebSocket
     initWebSocket();
 
@@ -46,6 +56,15 @@ const ThemeSwitch = (props) => {
 
     // Gửi message tới server qua WebSocket
     sendWebSocketMessage(message);
+
+    // Cập nhật trạng thái điều hòa lên server (MySQL)
+    updateButtonState({ button3Active: !isACOn })
+      .then(response => {
+        console.log("Trạng thái điều hòa đã được lưu:", response);
+      })
+      .catch(error => {
+        console.error("Lỗi khi lưu trạng thái điều hòa:", error);
+      });
   };
 
   return (
@@ -61,7 +80,8 @@ const ThemeSwitch = (props) => {
               "w-24 h-24 p-4",
               "flex items-center justify-center",
               "rounded-2xl bg-white hover:bg-slate-200",
-              loading ? "animate-spin" : "", // Hiển thị animation loading khi đợi phản hồi
+              isACOn ? "bg-green-500 hover:bg-red-700" : "bg-slate-200 hover:bg-green-500",
+              loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
             ],
           })}
           onClick={handleClick} // Gọi hàm handleClick khi nhấn nút

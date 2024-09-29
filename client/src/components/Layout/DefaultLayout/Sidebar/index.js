@@ -96,7 +96,7 @@ function Sidebar() {
                           <Link to={config.routes.profile} className="w-full">
                               <Button
                                   type="button"
-                                  color="none"
+                                  color="none" 
                                   radius="md"
                                   startContent={<CgProfile className="text-3xl ml-4"/>}
                                   className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
