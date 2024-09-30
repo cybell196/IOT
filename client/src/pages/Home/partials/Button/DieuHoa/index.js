@@ -80,7 +80,7 @@ const ThemeSwitch = (props) => {
               "w-24 h-24 p-4",
               "flex items-center justify-center",
               "rounded-2xl bg-white hover:bg-slate-200",
-              isACOn ? "bg-green-500 hover:bg-red-700" : "bg-slate-200 hover:bg-green-500",
+              isACOn ? "bg-green-500 hover:bg-red-700" : "bg-primary hover:bg-green-500",
               loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
             ],
           })}
@@ -89,7 +89,7 @@ const ThemeSwitch = (props) => {
           {isACOn ? (
             <TbAirConditioning className="text-yellow-300 w-full h-full spin" />
           ) : (
-            <TbAirConditioning className="w-full h-full" />
+            <TbAirConditioning className="w-full h-full text-white" />
           )}
         </div>
       </Component>

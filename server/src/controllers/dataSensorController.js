@@ -65,7 +65,7 @@ const connection = require('../db');
 exports.getAllData = (req, res) => {
     const { sortBy = 'thoi_gian', order = 'ASC', limit, filter } = req.query;
 
-    let query = 'SELECT id, nhiet_do, do_am, anh_sang, thoi_gian FROM DataSensor';
+    let query = 'SELECT * FROM DataSensor';
 
     if (filter) { 
         query += ` WHERE ${filter}`;
@@ -156,7 +156,7 @@ exports.getData = (req, res) => {
     const limitValue = parseInt(limit, 10);
 
     // Tạo câu truy vấn SQL để lấy 8 giá trị cuối cùng (ORDER BY id DESC)
-    let query = `SELECT id, nhiet_do, do_am, anh_sang, thoi_gian FROM DataSensor ORDER BY id DESC LIMIT ?`;
+    let query = `SELECT * FROM DataSensor ORDER BY id DESC LIMIT ?`;
 
     // Thực hiện truy vấn
     connection.query(query, [limitValue], (err, results) => {

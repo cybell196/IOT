@@ -83,7 +83,7 @@ const ThemeSwitch = (props) => {
               "w-24 h-24 p-4",
               "flex items-center justify-center",
               "rounded-2xl ",
-              isLightOn ? "bg-green-500 hover:bg-red-700" : "bg-slate-200 hover:bg-green-500",
+              isLightOn ? "bg-green-500 hover:bg-red-700" : "bg-primary hover:bg-green-500",
               
               loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
             ],
@@ -93,7 +93,7 @@ const ThemeSwitch = (props) => {
           {isLightOn ? (
             <FaLightbulb className="w-full h-full text-yellow-300 spin" />
           ) : (
-            <FaLightbulb className="w-full h-full" />
+            <FaLightbulb className="w-full h-full text-white" />
           )}
           {/* <FaLightbulb className="w-full h-full" /> */}
         </div>

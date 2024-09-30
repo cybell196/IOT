@@ -8,7 +8,7 @@ function setupWebSocket(server) {
 
     server.on('upgrade', (request, socket, head) => {
         const { url } = request;
-
+ 
         if (url === '/data') {
             wss.handleUpgrade(request, socket, head, (ws) => {
                 wss.emit('connection', ws, request, 'data');

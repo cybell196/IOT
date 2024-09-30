@@ -13,12 +13,17 @@ module.exports = {
     extend: {
       animation: {
         drip: 'drip 2s infinite', // Định nghĩa lớp animation "drip"
+        'move-right': 'moveRight 1s linear infinite',
       },
       keyframes: {
         drip: {
           '0%': { transform: 'translateY(-10px)', opacity: '0' },
           '50%': { opacity: '1' },
           '100%': { transform: 'translateY(10px)', opacity: '0' },
+        },
+        moveRight: {
+          '0%': { transform: 'translateX(-10%)' },
+          '100%': { transform: 'translateX(50%)' }, // Di chuyển từ trái sang phải
         },
       },
     },
