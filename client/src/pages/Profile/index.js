@@ -62,7 +62,7 @@ function ProfileCard() {
                       </div>
                   </div>
               </div>
-              <Image src="/0909.gif" alt="khabanh" className='ml-28'/>
+              {/* <Image src="/0909.gif" alt="khabanh" className='ml-28'/> */}
           </div>
           
       </div>

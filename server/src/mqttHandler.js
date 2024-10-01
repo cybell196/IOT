@@ -42,11 +42,11 @@ exports.subDataSensor = () => {
         const data = JSON.parse(message.toString().trim());
         
         // Kiểm tra nếu giá trị dobui lớn hơn 200 thì gửi lệnh bật quạt
-        if (data.dobui > 200) {
+        // if (data.dobui > 150) {
           
-          mqttClient.publish("led/control", "LED2_ON");  // Gửi lệnh bật quạt tới topic led/control
-          console.log("Độ bụi lớn hơn 200, tự động bật quạt (LED2_ON)");
-        }
+        //   mqttClient.publish("led/control", "LED2_ON");  // Gửi lệnh bật quạt tới topic led/control
+        //   console.log("Độ bụi lớn hơn 200, tự động bật quạt (LED2_ON)");
+        // }
 
         const query =
           "INSERT INTO DataSensor (nhiet_do, do_am, anh_sang, do_bui, thoi_gian) VALUES (?, ?, ?, ?, ?)";

@@ -157,7 +157,7 @@ export default function App() {
                     <span className="text-white text-2xl font-bold">Tổng cộng {users.length} kết quả</span>
                     <div className="flex justify-between items-center ml-12">
                         <label className="flex items-center text-default-400 text-lg">
-                            Số hàng trên một dòng:
+                            Page Size:
                             <select 
                                 className="bg-transparent outline-none text-yellow-400 text-small font-bold"
                                 onChange={onRowsPerPageChange}
