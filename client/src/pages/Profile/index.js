@@ -32,7 +32,7 @@ function ProfileCard() {
                       </div>
 
                       <div className="">
-                          <a href="#">
+                          <a href="/Báo cáo IOT.pdf" target='_blank'>
                               <Button
                                   color="success"
                                   className="bg-red-400 text-white text-2xl"
