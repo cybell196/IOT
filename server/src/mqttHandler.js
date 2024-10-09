@@ -40,12 +40,32 @@ exports.subDataSensor = () => {
       // Xử lý topic 'sensor/data' - Dữ liệu cảm biến
       if (topic === "sensor/data") {
         const data = JSON.parse(message.toString().trim());
-        
-        // Kiểm tra nếu giá trị dobui lớn hơn 200 thì gửi lệnh bật quạt
-        // if (data.dobui > 150) {
+        const mess = {
+          type: "LED_CONTROL",
+          command: "LED1_OFF"
+        }
+        // Kiểm tra nếu giá trị dobui lớn hơn 80 thì nháy đèn
+        if (data.dobui > 80) {
+          const message = {
+            type: "LED_CONTROL",
+            command: "LED1_DISABLE_ON"
+          }
+          sendDataToControlClients(message);
+          sendDataToControlClients(mess);
           
-        //   mqttClient.publish("led/control", "LED2_ON");  // Gửi lệnh bật quạt tới topic led/control
-        //   console.log("Độ bụi lớn hơn 200, tự động bật quạt (LED2_ON)");
+        }else{
+          const message = {
+            type: "LED_CONTROL",
+            command: "LED1_DISABLE_OFF"
+          }
+          sendDataToControlClients(message);
+
+        }
+        // Kiểm tra nếu giá trị dobui lớn hơn 200 thì gửi lệnh bật quạt
+        // if (data.anhsang > 200) {
+          
+        //   mqttClient.publish("led/control", "LED1_ON");  // Gửi lệnh bật quạt tới topic led/control
+        //   console.log("ánh sáng lớn hơn 200, tự động bật đèn (LED1_ON)");
         // }
 
         const query =

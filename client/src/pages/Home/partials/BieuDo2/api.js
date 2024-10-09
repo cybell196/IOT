@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-export function fetchData() {
+export function fetchAllData() {
     return axios
-        .get('http://localhost:3002/api/action-history', {
+        .get('http://localhost:3002/api/data-sensor/data-chart', {
             params: {
                 // sortBy: 'nhiet_do',  // Uncomment if needed
-                // order: 'DESC',      // Uncomment if needed
-                // limit: 10           // Uncomment if needed
+                order: 'DESC',      // Uncomment if needed
+                limit: 8           // Uncomment if needed
             },
         })
         .then((response) => {
@@ -25,5 +25,3 @@ export function fetchData() {
             return [];  // Trả về mảng rỗng khi có lỗi
         });
 }
-
-

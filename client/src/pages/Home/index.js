@@ -1,7 +1,7 @@
 import Button from './partials/Button';
 import ThongSo from './partials/ThongSo';
 import BieuDo from './partials/BieuDo';
-// import BieuDo2 from './partials/BieuDo2';
+import BieuDo2 from './partials/BieuDo2';
 
 
 function Home() {
@@ -16,7 +16,7 @@ function Home() {
                     {/* <div className="text-white text-start font-bold text-3xl ml-8 p-4">Biểu đồ</div> */}
                     <div className='grid grid-rows-1 gap-4'>
                         <div className='bg-slate-950 bg-opacity-50 rounded-2xl'><BieuDo /></div>
-                        {/* <div className='bg-slate-950 bg-opacity-50 rounded-2xl'><BieuDo2 /></div> */}
+                        <div className='bg-slate-950 bg-opacity-50 rounded-2xl'><BieuDo2 /></div>
                     </div>
                 </div>
 

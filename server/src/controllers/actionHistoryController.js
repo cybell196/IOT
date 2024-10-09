@@ -139,3 +139,28 @@ exports.getActionById = (req, res) => {
         res.json(results[0]);
     });
 };
+
+
+exports.getTodaysActionsCount = (req, res) => {
+    // Lấy ngày hiện tại ở định dạng YYYY-MM-DD
+    const today = new Date().toISOString().slice(0, 10);
+
+    // Câu truy vấn SQL để đếm số lần bật/tắt thiết bị trong ngày hôm nay
+    const query = `
+        SELECT COUNT(*) AS count
+        FROM ActionHistory
+        WHERE DATE(thoi_gian) = ?
+        AND (hanh_dong = 'Bật' OR hanh_dong = 'Tắt')
+    `;
+
+    // Thực hiện câu truy vấn
+    connection.query(query, [today], (err, results) => {
+        if (err) {
+            console.error('Lỗi truy vấn:', err);
+            res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu' });
+            return;
+        }
+        
+        res.json({ count: results[0].count });
+    });
+};

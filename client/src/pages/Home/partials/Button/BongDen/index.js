@@ -1,6 +1,6 @@
+import { useState, useEffect } from "react";
 import { FaLightbulb } from "react-icons/fa6";
 import { Switch, VisuallyHidden, useSwitch } from "@nextui-org/react";
-import { useState, useEffect } from "react";
 import { initWebSocket, sendWebSocketMessage, addWebSocketListener } from "../webSocketControl"; // Import các hàm từ file WebSocket
 import { getButtonState, updateButtonState } from "../api";
 
@@ -16,6 +16,7 @@ const ThemeSwitch = (props) => {
 
   const [loading, setLoading] = useState(false); // Trạng thái loading
   const [isLightOn, setIsLightOn] = useState(false); // Trạng thái bật tắt đèn
+  const [isDisabled, setIsDisabled] = useState(false); // Trạng thái vô hiệu hóa button
   
   useEffect(() => {
     // Lấy trạng thái từ server khi trang được load
@@ -39,35 +40,37 @@ const ThemeSwitch = (props) => {
         } else if (data.command === "LED1_OFF") {
           setIsLightOn(false); // Đèn đã tắt
           setLoading(false);
+        } else if (data.command === "LED1_DISABLE_ON") {
+          setIsDisabled(true); // Vô hiệu hóa nút
+        } else if (data.command === "LED1_DISABLE_OFF") {
+          setIsDisabled(false); // Hủy vô hiệu hóa nút
         }
-        
       }
     });
-
   }, []);
 
   const handleClick = () => {
-    
-    setLoading(true); // Bật trạng thái loading khi nhấn nút
+    if (!isDisabled) {
+      setLoading(true); // Bật trạng thái loading khi nhấn nút
 
-    // Tạo JSON message tùy theo trạng thái đèn
-    const message = {
-      type: "LED_CONTROL",
-      command: isLightOn ? "LED1_OFF" : "LED1_ON"
-    };
+      // Tạo JSON message tùy theo trạng thái đèn
+      const message = {
+        type: "LED_CONTROL",
+        command: isLightOn ? "LED1_OFF" : "LED1_ON"
+      };
 
-    // Gửi message tới server qua WebSocket
-    sendWebSocketMessage(message);
+      // Gửi message tới server qua WebSocket
+      sendWebSocketMessage(message);
 
-    // Cập nhật trạng thái bóng đèn lên server (MySQL)
-    updateButtonState({ button1Active: !isLightOn })
-      .then(response => {
-        console.log("Trạng thái bóng đèn đã được lưu:", response);
-      })
-      .catch(error => {
-        console.error("Lỗi khi lưu trạng thái bóng đèn:", error);
-      });
-    
+      // Cập nhật trạng thái bóng đèn lên server (MySQL)
+      updateButtonState({ button1Active: !isLightOn })
+        .then(response => {
+          console.log("Trạng thái bóng đèn đã được lưu:", response);
+        })
+        .catch(error => {
+          console.error("Lỗi khi lưu trạng thái bóng đèn:", error);
+        });
+    }
   };
 
   return (
@@ -84,23 +87,23 @@ const ThemeSwitch = (props) => {
               "flex items-center justify-center",
               "rounded-2xl ",
               isLightOn ? "bg-green-500 hover:bg-red-700" : "bg-primary hover:bg-green-500",
-              
               loading ? "animate-ping" : "", // Hiển thị animation loading khi đợi phản hồi
+              isDisabled ? "pointer-events-none opacity-50 cursor-not-allowed " : "" // Vô hiệu hóa nếu isDisabled
             ],
           })}
-          onClick={handleClick} // Gọi hàm handleClick khi nhấn nút
+          onClick={!isDisabled && !loading ? handleClick : null} // Chỉ cho phép nhấn nếu không bị vô hiệu hóa
         >
           {isLightOn ? (
             <FaLightbulb className="w-full h-full text-yellow-300 spin" />
           ) : (
             <FaLightbulb className="w-full h-full text-white" />
           )}
-          {/* <FaLightbulb className="w-full h-full" /> */}
         </div>
       </Component>
       <p className="text-white select-none font-bold mx-4 pr-2">
-        Bóng đèn: {isLightOn ? "bật" : "tắt"} {loading && "(đang xử lý...)"}
-      </p>
+          Bóng đèn: {isLightOn ? "bật" : "tắt"} {loading && "(đang xử lý...)"}
+        </p>
+      
     </div>
   );
 };

@@ -14,6 +14,7 @@ import {
     DropdownItem,
     Pagination,
 } from '@nextui-org/react';
+
 import { columns, users } from './data';
 import { capitalize } from './utils';
 import { FaAngleDown, FaSearch } from 'react-icons/fa';
@@ -32,7 +33,7 @@ export default function App() {
         column: 'id',
         direction: 'ascending',
     });
-
+    
     // ----------------- Fetch data -----------------
     const [users, setUsers] = React.useState([]); // new state for users
     React.useEffect(() => {
@@ -50,7 +51,7 @@ export default function App() {
             });
     }, []);
     // ----------------------------------------------
-
+    
     const [page, setPage] = React.useState(1);
 
     const hasSearchFilter = Boolean(filterValue);
@@ -87,7 +88,7 @@ export default function App() {
 
     const filteredItems = React.useMemo(() => {
         let filteredUsers = [...users];
-
+        
         if (hasSearchFilter) {
             filteredUsers = filteredUsers.filter((user) =>
                 user.thoi_gian && typeof user.thoi_gian === 'string' && filterValue && typeof filterValue === 'string'
@@ -165,15 +166,17 @@ export default function App() {
         setPage(1);
     }, []);
 
+    
+
     const topContent = React.useMemo(() => {
         return (
             <div className=" grid grid-cols-3 gap-4 mb-2">
                 <div className="flex items-end gap-3 col-span-1">
-                    <span className="text-white text-2xl font-bold">Tổng cộng {users.length} kết quả</span>
+                    <span className="text-white text-2xl font-bold">Tổng cộng {filteredItems.length} kết quả</span>
                     <div className="flex justify-between items-center ml-12">
                         <label className="flex items-center text-default-400 text-lg">
                             Page Size:
-                            <select 
+                            <select
                                 className="bg-transparent outline-none text-yellow-400 text-small font-bold"
                                 onChange={onRowsPerPageChange}
                             >
