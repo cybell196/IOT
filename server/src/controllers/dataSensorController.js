@@ -33,25 +33,16 @@ const connection = require('../db');
  *     tags: [DataSensor]
  *     parameters:
  *       - in: query
- *         name: sortBy
+ *         name: searchTerm
  *         schema:
  *           type: string
- *         description: "Sắp xếp theo trường dữ liệu (vd: thoi_gian)"
- *       - in: query
- *         name: order
- *         schema:
- *           type: string
- *         description: Thứ tự sắp xếp (ASC/DESC)
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *         description: Giới hạn số lượng bản ghi
+ *         description: "Từ khóa tìm kiếm (vd: 25)"
  *       - in: query
  *         name: filter
  *         schema:
  *           type: string
- *         description: "Điều kiện lọc dữ liệu (vd: nhiet_do > 25)"
+ *         description: "Điều kiện lọc dữ liệu (vd: nhiet_do, do_am, anh_sang, do_bui, thoi_gian)"
+ *         enum: [nhiet_do, do_am, anh_sang, do_bui, thoi_gian]
  *     responses:
  *       200:
  *         description: Thành công
@@ -62,21 +53,40 @@ const connection = require('../db');
  *               items:
  *                 $ref: '#/components/schemas/DataSensor'
  */
+// src/controllers/dataSensorController.js
 exports.getAllData = (req, res) => {
-    const { sortBy = 'thoi_gian', order = 'ASC', limit, filter } = req.query;
-
+    const searchTerm = req.query.searchTerm || '';
+    console.log("searchTerm: ", searchTerm);
+    console.log("req.query: ", req.query.filter);
     let query = 'SELECT * FROM DataSensor';
-
-    if (filter) { 
-        query += ` WHERE ${filter}`;
+    
+    // Sử dụng searchField để xác định trường tìm kiếm
+    if (searchTerm) {
+        switch (req.query.filter) {
+            case 'nhiet_do': // Tìm kiếm theo nhiệt độ
+                query += ` WHERE nhiet_do LIKE '%${searchTerm}%'`;
+                break;
+            case 'do_am': // Tìm kiếm theo độ ẩm
+                query += ` WHERE do_am LIKE '%${searchTerm}%'`;
+                break;
+            case 'anh_sang': // Tìm kiếm theo ánh sáng
+                query += ` WHERE anh_sang LIKE '%${searchTerm}%'`; 
+                break;
+            case 'do_bui': // Tìm kiếm theo độ bụi
+                query += ` WHERE do_bui LIKE '%${searchTerm}%'`;
+                break;
+            case 'thoi_gian': // Tìm kiếm theo thời gian
+                query += ` WHERE DATE_FORMAT(thoi_gian, '%d/%m/%Y, %H:%i:%s') LIKE '%${searchTerm}%'`;
+                break;
+            default:
+                query += ` WHERE nhiet_do LIKE '%${searchTerm}%' OR do_am LIKE '%${searchTerm}%' OR anh_sang LIKE '%${searchTerm}%' OR do_bui LIKE '%${searchTerm}%' OR DATE_FORMAT(thoi_gian, '%d/%m/%Y, %H:%i:%s') LIKE '%${searchTerm}%'`;
+                break;
+        }
+        console.log(query);
     }
- 
-    query += ` ORDER BY ${sortBy} ${order}`;
 
-    if (limit) {
-        query += ` LIMIT ${parseInt(limit, 10)}`;
-    }
 
+    // Thực hiện truy vấn với prepared statements
     connection.query(query, (err, results) => {
         if (err) {
             console.error('Lỗi truy vấn:', err);
@@ -84,15 +94,20 @@ exports.getAllData = (req, res) => {
             return;
         }
 
-        // Chuyển đổi múi giờ sang +07:00 trong server trước khi trả về client
+        // Điều chỉnh múi giờ trước khi trả về kết quả
         const adjustedResults = results.map(row => {
             const thoi_gian_local = new Date(row.thoi_gian).toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' });
             return { ...row, thoi_gian: thoi_gian_local };
         });
-        
+        console.log(query);
         res.json(adjustedResults);
     });
+
+    
+
 };
+
+
 /**
  * @swagger
  * /api/data-sensor/last-data:
@@ -177,3 +192,6 @@ exports.getData = (req, res) => {
         res.json(adjustedResults);
     });
 };
+  
+
+

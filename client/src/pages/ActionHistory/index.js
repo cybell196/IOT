@@ -1,4 +1,5 @@
 import React from 'react';
+import { debounce } from 'lodash';
 import {
     Table,
     TableHeader,
@@ -22,7 +23,7 @@ import { FaAngleDown, FaSearch } from 'react-icons/fa';
 
 import { columns, users, statusOptions } from './data';
 import { capitalize } from './utils';
-import { fetchData, fetchActionCount } from './api';
+import { fetchData, fetchTodaysActionsCount } from './api';
 
 const statusColorMap = {
     Bật: 'success',
@@ -38,35 +39,52 @@ export default function App() {
     const [statusFilter, setStatusFilter] = React.useState('all');
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
     const [sortDescriptor, setSortDescriptor] = React.useState({
-        column: 'thoi_gian',
-        direction: 'descending',
+        column: 'id',
+        direction: 'ascending',
     });
-    const [actionCounts, setActionCounts] = React.useState({ Bật: 0, Tắt: 0 });
-
-    // ----------------- Fetch data -----------------
-    const [users, setUsers] = React.useState([]); // new state for users
     
-    React.useEffect(() => {
-        fetchData()
-            .then((data) => {
-                if (Array.isArray(data)) {
-                    setUsers(data);
-                    const counts = data.reduce(
-                    (acc, user) => {
-                        if (user.hanh_dong === 'Bật') acc.Bật += 1;
-                        if (user.hanh_dong === 'Tắt') acc.Tắt += 1;
-                        return acc;
-                    },
-                    { Bật: 0, Tắt: 0 }
-                );
-                setActionCounts(counts);
+    // số lần bật tắt trong ngày hôm nay
+    const [actionCounts, setActionCounts] = React.useState({totalOn: 0, totalOff: 0});
+    const fetchActionCounts = () => {
+        fetchTodaysActionsCount()
+            .then((response) => {
+                if (response && typeof response === 'object') {
+                    // Cập nhật số lần bật và tắt từ response
+                    setActionCounts({
+                        totalOn: response.totalOn || 0,
+                        totalOff: response.totalOff || 0,
+                    });
+                    console.log('Cập nhật số lần bật và tắt:', response); // Log dữ liệu mới
                 } else {
-                    console.error('fetchData did not return an array:', data);
+                    console.error('fetchTodaysActionsCount không trả về một đối tượng:', response);
                 }
             })
             .catch((error) => {
-                console.error('fetchData failed:', error);
+                console.error('fetchTodaysActionsCount thất bại:', error);
             });
+    };
+
+    // ----------------- Fetch data -----------------
+    const [users, setUsers] = React.useState([]); // new state for users
+    const fetchUsers = (value = '') => {
+    fetchData(value)
+        .then((response) => {
+            if (Array.isArray(response)) {
+                setUsers(response);
+                // setActionCounts(response.actionCounts);
+                console.log('Updated users:', response); // Log new data
+            } else {
+                console.error('fetchData did not return an array:', response);
+            }
+        })
+        .catch((error) => {
+            console.error('fetchData failed:', error);
+        });
+};
+
+    React.useEffect(() => {
+        fetchUsers();
+        // fetchActionCounts();
     }, []);
     // ----------------------------------------------
     const [page, setPage] = React.useState(1);
@@ -90,21 +108,21 @@ export default function App() {
         if (statusFilter !== 'all' && Array.from(statusFilter).length !== statusOptions.length) {
             filteredUsers = filteredUsers.filter((user) => Array.from(statusFilter).includes(user.hanh_dong));
         }
-
-        const counts = filteredUsers.reduce(
-        (acc, user) => {
-            if (user.hanh_dong === 'Bật') acc.Bật += 1;
-            if (user.hanh_dong === 'Tắt') acc.Tắt += 1;
-            return acc;
-        },
-        { Bật: 0, Tắt: 0 }
-        );
-        setActionCounts(counts);
-
         return filteredUsers;
     }, [users, filterValue, statusFilter]);
 
-    
+    const debouncedFetchData = React.useCallback(
+        debounce((value) => {
+            fetchUsers(value);
+        }, 300), // Delay in milliseconds
+        [],
+    );
+
+    const onSearchChange = React.useCallback((value) => {
+        setFilterValue(value);
+        setPage(1);
+        debouncedFetchData(value);
+    }, []);
 
     const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -116,14 +134,15 @@ export default function App() {
     }, [page, filteredItems, rowsPerPage]);
 
     const sortedItems = React.useMemo(() => {
-        return [...filteredItems].sort((a, b) => {
-            const first = a[sortDescriptor.column];
-            const second = b[sortDescriptor.column];
+        return [...users].sort((a, b) => {
+            const columnToSort = sortDescriptor.column === 'thoi_gian' ? 'id' : sortDescriptor.column;
+            const first = a[columnToSort];
+            const second = b[columnToSort];
             const cmp = first < second ? -1 : first > second ? 1 : 0;
-
+    
             return sortDescriptor.direction === 'descending' ? -cmp : cmp;
         });
-    }, [sortDescriptor, filteredItems]);
+    }, [sortDescriptor, users]);
 
     const paginatedItems = React.useMemo(() => {
         const start = (page - 1) * rowsPerPage;
@@ -153,14 +172,6 @@ export default function App() {
         }
     }, []);
 
-    const onSearchChange = React.useCallback((value) => {
-        if (value) {
-            setFilterValue(value);
-            setPage(1);
-        } else {
-            setFilterValue('');
-        }
-    }, []);
 
     const onClear = React.useCallback(() => {
         setFilterValue('');
@@ -178,17 +189,7 @@ export default function App() {
                 <div className="flex items-end gap-3 col-span-1">
                     <span className="text-white text-2xl font-bold">Tổng cộng {filteredItems.length} kết quả</span>
                     <div className="flex justify-between items-center ml-12">
-                        <label className="flex items-center text-default-400 text-lg">
-                            Page Size:
-                            <select
-                                className="bg-transparent outline-none text-yellow-400 text-small font-bold"
-                                onChange={onRowsPerPageChange}
-                            >
-                                <option value="10">10</option>
-                                <option value="15">15</option>
-                                <option value="20">20</option>
-                            </select>
-                        </label>
+                        
                     </div>
                 </div>
                 <div className="flex gap-12 w-full col-span-2">
@@ -201,7 +202,7 @@ export default function App() {
                                     color="warning"
                                     size="lg"
                                     isClearable
-                                    placeholder="dd/mm/yyyy, hh:mm:ss"
+                                    placeholder="Nhập thời gian"
                                     value={filterValue}
                                     onClear={() => onClear()}
                                     onValueChange={onSearchChange}
@@ -238,19 +239,25 @@ export default function App() {
             </div>
         );
     }, [filterValue, statusFilter, users.length, onSearchChange, hasSearchFilter]);
-    
-    
 
     const bottomContent = React.useMemo(() => {
         return pages > 0 ? (
             <div className="flex w-full justify-between items-center">
-                {/* <div className="action-counts">
-                    <p className="text-white text-2xl">Số lần Bật: {actionCounts.Bật}</p>
-                    <p className="text-white text-2xl">Số lần Tắt: {actionCounts.Tắt}</p>
-                </div> */}
+                
                 <span className="w-[30%] text-small text-default-400">
-                    <p className="text-white text-2xl font-bold">Số lần Bật: {actionCounts.Bật}</p>
-                    <p className="text-white text-2xl font-bold">Số lần Tắt: {actionCounts.Tắt}</p>
+                   {/* <p className="text-white text-2xl font-bold">Số lần Bật trong ngày hôm nay: {actionCounts.totalOn || 0}</p>
+                    <p className="text-white text-2xl font-bold">Số lần Tắt trong ngày hôm nay: {actionCounts.totalOff || 0}</p> */}
+                    <label className="flex items-center text-default-400 text-2xl">
+                            Page Size:
+                            <select
+                                className="bg-transparent outline-none text-red-700 text-2xl font-bold"
+                                onChange={onRowsPerPageChange}
+                            >
+                                <option className="bg-gray-800 text-white hover:bg-gray-700" value="10">10</option>
+                                <option className="bg-gray-800 text-white hover:bg-gray-700" value="15">15</option>
+                                <option className="bg-gray-800 text-white hover:bg-gray-700" value="20">20</option>
+                            </select>
+                        </label>
                 </span>
                 <Pagination
                     showControls
@@ -265,15 +272,10 @@ export default function App() {
                         cursor: 'text-yellow-500 font-bold w-12 h-12 text-3xl bg-slate-950 bg-opacity-90 rounded-xl',
                         prev: 'w-12 h-12 text-3xl text-white rounded-xl bg-slate-950 bg-opacity-50',
                         next: 'w-12 h-12 text-3xl text-white rounded-xl bg-slate-950 bg-opacity-50',
-                        
                     }}
                 />
-                <div className="hidden sm:flex w-[30%] justify-end gap-2">
-                
-                </div>
-                
+                <div className="hidden sm:flex w-[30%] justify-end gap-2"></div>
             </div>
-            
         ) : null;
     }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 

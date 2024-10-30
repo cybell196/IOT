@@ -57,6 +57,24 @@ function Sidebar() {
                       </li>
 
                       <li className="flex items-center justify-center w-full row-span-1 rounded-3xl">
+                          <Link to={config.routes.homenew} className="w-full">
+                              <Button
+                                  type="button"
+                                  color="none"
+                                  radius="md"
+                                  startContent={<MdOutlineDashboard className="text-3xl ml-4"/>}
+                                  className={`flex items-center justify-start text-white shadow-lg w-full h-20 hover:bg-gradient-to-tr hover:from-slate-700 hover:to-slate-300 ${
+                                      isActive(config.routes.homenew)
+                                          ? 'bg-gradient-to-tr from-slate-700 to-slate-300'
+                                          : ''
+                                  }`}
+                              >
+                                  <p className="text-3xl text-start font-bold flex items-center">Dashboard New</p>
+                              </Button>
+                          </Link>
+                      </li>
+
+                      <li className="flex items-center justify-center w-full row-span-1 rounded-3xl">
                           <Link to={config.routes.datasensor} className="w-full">
                               <Button
                                   type="button"

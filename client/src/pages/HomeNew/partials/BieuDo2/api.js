@@ -1,15 +1,18 @@
 import axios from 'axios';
 
-export function fetchData(params) {
+export function fetchAllData() {
     return axios
-        .get('http://localhost:3002/api/data-sensor', {
+        .get('http://localhost:3002/api/data-sensor/data-chart', {
             params: {
-                searchField: params.searchField,  // Trường tìm kiếm (nhiet_do, do_am, anh_sang...)
-                searchTerm: params.searchTerm     // Từ khóa tìm kiếm
+                // sortBy: 'nhiet_do',  // Uncomment if needed
+                order: 'DESC',      // Uncomment if needed
+                limit: 8           // Uncomment if needed
             },
         })
         .then((response) => {
+            // Kiểm tra dữ liệu nhận được từ server
             console.log('Dữ liệu từ server:', response.data);
+            // Đảm bảo dữ liệu là mảng trước khi trả về
             if (Array.isArray(response.data)) {
                 return response.data;
             } else {

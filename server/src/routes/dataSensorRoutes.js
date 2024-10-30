@@ -71,3 +71,4 @@ router.get('/last-data', dataSensorController.getLastData);
  */
 router.get('/data-chart', dataSensorController.getData);
 module.exports = router;
+  

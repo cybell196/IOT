@@ -4,7 +4,7 @@ import DieuHoa from "./DieuHoa";
 import AlertCount from "./SoLanCB";
 export default function Button() {
   return (
-    <div className="grid grid-rows-3 gap-8 items-center justify-center p-12 h-full"> 
+    <div className="grid grid-rows-2 gap-8 items-center justify-center p-12 h-full"> 
         <style jsx>{`
             @keyframes spin {
                 0% { transform: rotate(0deg); }
@@ -16,9 +16,9 @@ export default function Button() {
               }
         `}</style>  
         <BongDen/>
-        <Quat/>
-        <DieuHoa/>
-        {/* <AlertCount/> */}
+        {/* <Quat/> */}
+        {/* <DieuHoa/> */}
+        <AlertCount/>
     </div> 
 
   );

@@ -1,4 +1,5 @@
 const connection = require('../db'); // Đảm bảo đường dẫn đúng tới file db.js
+const moment = require('moment');
 
 /**
  * @swagger
@@ -66,8 +67,11 @@ exports.getAllActions = (req, res) => {
     let query = 'SELECT id, thiet_bi, hanh_dong, thoi_gian FROM ActionHistory';
     
     // Xử lý lọc dữ liệu nếu có filter
-    if (filter) {
-        query += ` WHERE ${filter}`;
+    if (filter) { 
+        // Chuyển đổi filter thành định dạng ngày tháng MySQL có thể hiểu
+        const formattedFilter = `%${filter}%`;
+
+        query += ` WHERE DATE_FORMAT(thoi_gian, '%d/%m/%Y, %H:%i:%s') LIKE '${formattedFilter}'`;
     }
     
     // Thêm điều kiện sắp xếp
@@ -89,78 +93,85 @@ exports.getAllActions = (req, res) => {
             const thoi_gian_local = new Date(row.thoi_gian).toLocaleString('en-GB', { timeZone: 'Asia/Ho_Chi_Minh' });
             return { ...row, thoi_gian: thoi_gian_local };
         });
-        
+        console.log(query);
         res.json(adjustedResults);
     });
 };
 
+
+
+
+// exports.getTodaysActionsCount = (req, res) => {
+//     const today = moment().format('YYYY-MM-DD');
+//     const query = `
+//         SELECT 
+//             SUM(CASE WHEN hanh_dong = 'Bật' THEN 1 ELSE 0 END) AS totalOn,
+//             SUM(CASE WHEN hanh_dong = 'Tắt' THEN 1 ELSE 0 END) AS totalOff
+//         FROM actionhistory
+//         WHERE DATE(thoi_gian) = ?
+//     `;
+
+//     connection.query(query, [today], (error, results) => {
+//         if (error) {
+//             console.error('Lỗi khi truy vấn cơ sở dữ liệu:', error);
+//             return res.status(500).json({ error: 'Lỗi server' });
+//         }
+
+//         // Kiểm tra kết quả truy vấn
+//         console.log('Kết quả truy vấn:', results);
+
+//         // Nếu không có kết quả, trả về lỗi
+//         if (!results || results.length === 0) {
+//             return res.status(404).json({ error: 'Dữ liệu không tìm thấy' });
+//         }
+
+//         const totalOn = results[0].totalOn;
+//         const totalOff = results[0].totalOff;
+
+//         // Kiểm tra xem có giá trị không
+//         if (totalOn === null && totalOff === null) {
+//             return res.status(404).json({ error: 'Dữ liệu không tìm thấy' });
+//         }
+
+//         res.json({ totalOn, totalOff, today });
+//     });
+// };
+
+
 /**
  * @swagger
- * /api/action-history/{id}:
+ * /api/action-history/count-alert-on:
  *   get:
- *     summary: Lấy hành động theo ID
+ *     summary: Đếm số lần thiết bị "Cảnh báo" có hành động là "Bật"
  *     tags: [ActionHistory]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID của hành động
  *     responses:
  *       200:
  *         description: Thành công
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ActionHistory'
- *       404:
- *         description: Không tìm thấy hành động
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Số lần thiết bị "Cảnh báo" có hành động là "Bật"
  */
-exports.getActionById = (req, res) => {
-    const id = req.params.id;
-    
-    // Câu lệnh SQL để lấy dữ liệu theo ID
-    const query = 'SELECT id, thiet_bi, hanh_dong, thoi_gian FROM ActionHistory WHERE id = ?';
-    
-    // Thực hiện câu truy vấn
-    connection.query(query, [id], (err, results) => {
-        if (err) {
-            console.error('Lỗi truy vấn:', err);
-            res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu' });
-            return;
-        }
-        
-        if (results.length === 0) {
-            res.status(404).json({ error: 'Dữ liệu không tìm thấy' });
-            return;
-        }
-        
-        res.json(results[0]);
-    });
-};
-
-
-exports.getTodaysActionsCount = (req, res) => {
-    // Lấy ngày hiện tại ở định dạng YYYY-MM-DD
-    const today = new Date().toISOString().slice(0, 10);
-
-    // Câu truy vấn SQL để đếm số lần bật/tắt thiết bị trong ngày hôm nay
+exports.countAlertOn = (req, res) => {
     const query = `
-        SELECT COUNT(*) AS count
-        FROM ActionHistory
-        WHERE DATE(thoi_gian) = ?
-        AND (hanh_dong = 'Bật' OR hanh_dong = 'Tắt')
-    `;
+  SELECT COUNT(*) as count 
+  FROM ActionHistory 
+  WHERE thiet_bi = "Cảnh báo" 
+    AND hanh_dong = "Bật" 
+    AND DATE(thoi_gian) = CURDATE()
+`; 
 
-    // Thực hiện câu truy vấn
-    connection.query(query, [today], (err, results) => {
+    connection.query(query, (err, results) => {
         if (err) {
             console.error('Lỗi truy vấn:', err);
             res.status(500).json({ error: 'Lỗi truy vấn cơ sở dữ liệu' });
             return;
         }
-        
-        res.json({ count: results[0].count });
+
+        res.json(results[0]);
     });
 };

@@ -33,7 +33,7 @@ function ThongSo() {
 
     return (
         <div className="grid grid-cols-3 gap-24 h-full">
-            <div class="bg-slate-950 bg-opacity-50 flex items-center justify-start p-10 rounded-3xl">
+            {/* <div class="bg-slate-950 bg-opacity-50 flex items-center justify-start p-10 rounded-3xl">
                 <div className="grid grid-cols-3 w-full">
                     <div className="col-span-2">
                         <p className="text-start text-slate-300 text-3xl font-bold mb-1">Nhiệt độ</p>
@@ -94,15 +94,15 @@ function ThongSo() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
-            {/* <div class="bg-slate-950 bg-opacity-50 flex items-center justify-start p-10 rounded-3xl">
+            <div class="bg-slate-950 bg-opacity-50 flex items-center justify-start p-10 rounded-3xl">
                 <div className="grid grid-cols-3 w-full">
                     <div className="col-span-2">
                         <p className="text-start text-slate-300 text-3xl font-bold mb-1">Độ bụi</p>
                         <p
                             className={`text-start text-3xl font-bold ${
-                                data.dobui > 60 ? 'text-red-500' : 'text-white'
+                                data.dobui > 71 ? 'text-red-500' : 'text-white'
                             }`}
                         >
                             <CountUp start={oldData.dobui} end={data.dobui} decimals={1} suffix=" µg/m³" />
@@ -111,9 +111,9 @@ function ThongSo() {
 
                     <div className="col-span-1 ml-12 flex items-center justify-center">
                         <div className={`p-6 rounded-3xl transition-all duration-1000 ${
-                                data.dobui > 60 ? 'bg-red-600 animate-ping' : 'bg-slate-300'
+                                data.dobui > 71 ? 'bg-red-600 animate-ping' : 'bg-slate-300'
                             }`}>
-                            {data.dobui > 60 ? (
+                            {data.dobui > 71 ? (
                                 <IoWarning className="text-center text-white text-3xl" />
                             ) : (
                                 <FiWind className="text-center text-white text-3xl animate-move-right" />
@@ -121,7 +121,7 @@ function ThongSo() {
                         </div>
                     </div>
                 </div>
-            </div> */}
+            </div>
 
             {/* <div class="bg-slate-950 bg-opacity-50 flex items-center justify-start p-10 rounded-3xl">
                 <div className="grid grid-cols-3 w-full">

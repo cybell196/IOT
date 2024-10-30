@@ -28,7 +28,7 @@ setupSwagger(app); // Tích hợp Swagger vào ứng dụng Express
 // Routes
 app.use('/api/data-sensor', dataSensorRoutes);
 app.use('/api/action-history', actionHistoryRoutes);
-app.use('/api/last-data', dataSensorRoutes);
+// app.use('/api/last-data', dataSensorRoutes);
 app.use('/api', buttonRoutes);
 
 server.listen(3002, () => {

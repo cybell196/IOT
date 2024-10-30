@@ -29,31 +29,27 @@ const actionHistoryController = require('../controllers/actionHistoryController'
  *         description: Lỗi từ server
  */
 router.get('/', actionHistoryController.getAllActions);
+
+
 /**
  * @swagger
- * /api/action-history/{id}:
+ * /api/action-history/count-alert-on:
  *   get:
- *     summary: Lấy lịch sử hành động theo ID
+ *     summary: Đếm số lần thiết bị "Cảnh báo" có hành động là "Bật"
  *     tags: [ActionHistory]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: integer
- *         required: true
- *         description: ID của lịch sử hành động
  *     responses:
  *       200:
  *         description: Thành công
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ActionHistory'
- *       404:
- *         description: Không tìm thấy hành động
- *       500:
- *         description: Lỗi từ server
+ *               type: object
+ *               properties:
+ *                 count:
+ *                   type: integer
+ *                   description: Số lần thiết bị "Cảnh báo" có hành động là "Bật"
  */
-router.get('/:id', actionHistoryController.getActionById);
+router.get('/count-alert-on', actionHistoryController.countAlertOn);
+
 
 module.exports = router;

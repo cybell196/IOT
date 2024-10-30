@@ -20,6 +20,8 @@ function Header() {
                 return 'Data Sensor';
             case '/action-history':
                 return 'Action History';
+            case '/home-new':
+                return 'Dashboard New';
             default:
                 return 'Dashboard';
         }

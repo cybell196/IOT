@@ -5,6 +5,7 @@ import config from "~/config";
 
 //pages
 import Home from "~/pages/Home";
+import HomeNew from "~/pages/HomeNew";
 import DataSensor from "~/pages/DataSensor";
 import ActionHistory from "~/pages/ActionHistory";
 import Profile from "~/pages/Profile";
@@ -12,6 +13,7 @@ import Profile from "~/pages/Profile";
 // Define the public and private routes
 const publicRoutes = [
     {path: config.routes.home, component: Home},
+    {path: config.routes.homenew, component: HomeNew},
     {path: config.routes.datasensor, component: DataSensor},
     {path: config.routes.actionhistory, component: ActionHistory},
     {path: config.routes.profile, component: Profile},

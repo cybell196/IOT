@@ -1,14 +1,18 @@
-const { format } = require('date-fns');
+const { format } = require("date-fns");
+const { updateButtonState } = require('./controllers/buttonController'); // Import module buttonController
 const mqtt = require("mqtt");
 const mqttBrokerUrl = "mqtt://localhost:2003"; // Địa chỉ MQTT broker của bạn
 const options = {
-  username: "nguyenanhkiet",  // Thêm username MQTT
-  password: "b21dccn471"   // Thêm password MQTT
+  username: "nguyenanhkiet", // Thêm username MQTT
+  password: "b21dccn471", // Thêm password MQTT
 };
 const mqttClient = mqtt.connect(mqttBrokerUrl, options);
- 
+
 const connection = require("./db"); // Kết nối MySQL
-const { sendDataToDataClients, sendDataToControlClients } = require("./webSocketHandler"); // Gửi dữ liệu tới client qua WebSocket
+const {
+  sendDataToDataClients,
+  sendDataToControlClients,
+} = require("./webSocketHandler"); // Gửi dữ liệu tới client qua WebSocket
 
 // Hàm để bắt đầu subscribe
 exports.subDataSensor = () => {
@@ -35,42 +39,17 @@ exports.subDataSensor = () => {
 
     try {
       const thoiGianHienTai = new Date();
-      const formattedTime = format(thoiGianHienTai, 'yyyy-MM-dd HH:mm:ss');
+      const formattedTime = format(thoiGianHienTai, "yyyy-MM-dd HH:mm:ss");
 
       // Xử lý topic 'sensor/data' - Dữ liệu cảm biến
       if (topic === "sensor/data") {
         const data = JSON.parse(message.toString().trim());
-        const mess = {
-          type: "LED_CONTROL",
-          command: "LED1_OFF"
-        }
-        // Kiểm tra nếu giá trị dobui lớn hơn 80 thì nháy đèn
-        if (data.dobui > 80) {
-          const message = {
-            type: "LED_CONTROL",
-            command: "LED1_DISABLE_ON"
-          }
-          sendDataToControlClients(message);
-          sendDataToControlClients(mess);
-          
-        }else{
-          const message = {
-            type: "LED_CONTROL",
-            command: "LED1_DISABLE_OFF"
-          }
-          sendDataToControlClients(message);
-
-        }
-        // Kiểm tra nếu giá trị dobui lớn hơn 200 thì gửi lệnh bật quạt
-        // if (data.anhsang > 200) {
-          
-        //   mqttClient.publish("led/control", "LED1_ON");  // Gửi lệnh bật quạt tới topic led/control
-        //   console.log("ánh sáng lớn hơn 200, tự động bật đèn (LED1_ON)");
-        // }
-
         const query =
           "INSERT INTO DataSensor (nhiet_do, do_am, anh_sang, do_bui, thoi_gian) VALUES (?, ?, ?, ?, ?)";
         const values = [data.nhietdo, data.doam, data.anhsang, data.dobui, formattedTime];
+        // const query = "SELECT 1"; // Câu lệnh SQL không thực hiện thao tác lưu dữ liệu
+        // const values = []; // Không cần giá trị cho câu lệnh SELECT 1
+
         connection.query(query, values, (err, result) => {
           if (err) {
             console.error("Lỗi khi lưu dữ liệu vào MySQL:", err);
@@ -97,7 +76,6 @@ exports.subDataSensor = () => {
         const data = JSON.parse(message.toString().trim());
 
         if (data.type === "LED_CONTROL" && data.command) {
-          
           let thiet_bi = "";
           let hanh_dong = "";
 
@@ -125,6 +103,20 @@ exports.subDataSensor = () => {
             case "LED3_OFF":
               thiet_bi = "Điều hòa";
               hanh_dong = "Tắt";
+              break;
+            case "WARNING_ON":
+              thiet_bi = "Cảnh báo";
+              hanh_dong = "Bật";
+              break;
+            case "WARNING_LED_ON":
+              thiet_bi = "Đèn mới";
+              hanh_dong = "Bật";
+              updateButtonState({ body: { button4Active: 1 } }, { json: () => {} }); // Cập nhật trạng thái button4 là 1
+              break;
+            case "WARNING_LED_OFF":
+              thiet_bi = "Đèn mới";
+              hanh_dong = "Tắt";
+              updateButtonState({ body: { button4Active: 0 } }, { json: () => {} }); // Cập nhật trạng thái button4 là 0
               break;
             default:
               console.log("Lệnh không hợp lệ");
